@@ -1,0 +1,148 @@
+
+type Query {
+    
+    users: [User!]!
+    posts: [Post!]!
+    comments: [Comment!]!
+    categories: [Category!]!
+    bookmarks: [Bookmark!]!
+    me: User!
+
+}
+
+type Mutation {
+
+    signIn(data: SignInInput!): String
+    signUp(data: SignUpInput!): String
+
+    createUser(data: CreateUserInput!): User!
+    updateUser(id: ID!, data: CreateUserInput!): User!
+    deleteUser(id: ID!): User!
+
+    createPost(data: CreatePostInput!): Post
+    updatePost(id: ID!, data: UpdatePostInput!): Post!
+    deletePost(id: ID!): Post!
+
+    createComment(data: CreateCommentInput!): Comment!
+    updateComment(id: ID!, data: UpdateCommentInput!): Comment!
+    deleteComment(id: ID!): Comment!
+
+    createCategory(data: CreateCategoryInput!): Category!
+    updateCategory(id: ID!, data: UpdateCategoryInput!): Category!
+    deleteCategory(id: ID!): Category!
+
+    createBookmark(data: CreateBookmarkInput!): Bookmark!
+    deleteBookmark(id: ID!): Bookmark!
+}
+
+type User {
+    id: ID!
+    username: String!
+    email: String!
+    password: String!
+    posts: [Post!]!
+    comments: [Comment!]!
+}
+
+type Post {
+    id: ID!
+    title: String!
+    description: String!
+    content: String!
+    imageUrl: String!
+    isVisible: Boolean!
+    creator: User!
+    comments: [Comment!]!
+    categories: [Category!]!
+    bookmarks: [Bookmark!]!
+}
+
+type Comment {
+    id: ID!
+    content: String!
+    user: User!
+    post: Post!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    description: String
+}
+
+type Bookmark {
+    id: ID!
+    post: Post!
+    user: User!
+}
+
+input SignInInput {
+    email: String!
+    password: String!
+}
+
+input SignUpInput {
+    username: String!
+    email: String!
+    password: String!
+    profilePhotoUrl: String!
+}
+
+input CreateUserInput {
+    username: String!
+    email: String!
+    password: String!
+    profilePhotoUrl: String!
+}
+ 
+input UpdateUserInput {
+    username: String!
+    email: String!
+    password: String!
+    profilePhotoUrl: String!
+}
+
+input CreatePostInput {
+    title: String!
+    description: String!
+    content: String!
+    imageUrl: String!
+    isVisible: Boolean!
+    author: ID!
+}
+
+input UpdatePostInput {
+    title: String!
+    description: String!
+    content: String!
+    imageUrl: String!
+    isVisible: Boolean!
+    author: ID!
+}
+
+input CreateCommentInput {
+    content: String!
+    post: ID!
+    user: ID!
+}
+
+input UpdateCommentInput {
+    content: String!
+    post: ID!
+    user: ID!
+}
+
+input CreateCategoryInput {
+    name: String!
+    description: String
+}
+
+input UpdateCategoryInput {
+    name: String!
+    description: String
+}
+
+input CreateBookmarkInput {
+    post: ID!
+    user: ID!
+}
