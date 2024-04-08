@@ -8,7 +8,6 @@ const postSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
     },
     content: {
         type: String,
@@ -33,7 +32,7 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    creatorId: {
+    authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
