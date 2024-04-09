@@ -1,3 +1,4 @@
+import authenticate from '../middlewares/authenticate';
 import Bookmark from '../models/bookmark';
 import Category from '../models/category';
 import Comment from '../models/comment';
@@ -5,13 +6,16 @@ import Post from '../models/post';
 import ReadingList from '../models/reading_list';
 import User from '../models/user'
 
+
 const Query = {
     async users(parent, args, contextValue, info) {
         const users = await User.find()
         return users
     },
     async posts(parent, args, contextValue, info) {
-        const posts = await Post.find()
+        authenticate(contextValue.token)
+
+        const posts = await Post.find().populate('author').exec()
         return posts
     },
     async categories(parent, args, contextValue, info) {

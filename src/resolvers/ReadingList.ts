@@ -2,8 +2,11 @@ import User from "../models/user"
 
 const ReadingList = {
     async creator(parent, args, contextValue, info) {
-        const creator = await User.findById(parent.creatorId)
+        const creator = await User.findById(parent.creator)
         return creator
+    },
+    async posts(parent, args, contextValue, info)  {
+
     }
 
 }

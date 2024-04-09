@@ -4,7 +4,7 @@ import User from "../models/user"
 
 const Post = {
     async author(parent, args, contextValue, info) {
-        const user = await User.findById(parent.authorId)
+        const user = await User.findById(parent.author)
         return user
     },
     async comments(parent, args, contextValue, info) {

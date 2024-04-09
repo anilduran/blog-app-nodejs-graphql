@@ -33,7 +33,15 @@ const bootstrap = async () => {
     try {
         mongoose.connect('mongodb://localhost:27017/blogdb')
         const { url } = await startStandaloneServer(server, {
-            listen: {port: 4000}
+            listen: {port: 4000},
+            context: async ({ req, res }) => {
+
+                const token = req.headers.authorization || ''
+
+                return {
+                    token
+                }
+            }
         })
         console.log('server is listening on', url)
     } catch(error) {

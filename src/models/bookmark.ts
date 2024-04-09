@@ -1,11 +1,11 @@
 import mongoose, { mongo } from 'mongoose'
 
 const bookmarkSchema = new mongoose.Schema({
-    postId: {
+    post: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     }

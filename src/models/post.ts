@@ -32,7 +32,7 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    authorId: {
+    author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },

@@ -38,6 +38,8 @@ type Mutation {
     createReadingList(data: CreateReadingListInput!): ReadingList!
     updateReadingList(id: ID!, data: UpdateReadingListIput!): ReadingList!
     deleteReadingList(id: ID!): ReadingList!
+    addPostToReadingList(postId: ID!, readingListId: ID!): Post!
+    removePostFromReadingList(postId: ID!, readingListId: ID!): Post!
 }
 
 type User {
@@ -56,7 +58,6 @@ type Post {
     content: String!
     imageUrl: String!
     isVisible: Boolean!
-    authorId: String!
     author: User!
     comments: [Comment!]!
     categories: [Category!]!
@@ -66,8 +67,6 @@ type Post {
 type Comment {
     id: ID!
     content: String!
-    userId: String!
-    postId: String!
     user: User!
     post: Post!
 }
@@ -81,8 +80,6 @@ type Category {
 
 type Bookmark {
     id: ID!
-    postId: String!
-    userId: String!
     post: Post!
     user: User!
 }
@@ -92,7 +89,6 @@ type ReadingList {
     name: String!
     description: String
     imageUrl: String
-    creatorId: String!
     posts: [Post!]!
     creator: User!
 }
@@ -128,7 +124,7 @@ input CreatePostInput {
     content: String!
     imageUrl: String!
     isVisible: Boolean!
-    authorId: ID!
+    author: ID!
 }
 
 input UpdatePostInput {
@@ -137,19 +133,18 @@ input UpdatePostInput {
     content: String
     imageUrl: String
     isVisible: Boolean
-    authorId: ID!
 }
 
 input CreateCommentInput {
     content: String!
-    postId: ID!
-    userId: ID!
+    post: ID!
+    user: ID!
 }
 
 input UpdateCommentInput {
     content: String!
-    postId: ID!
-    userId: ID!
+    post: ID!
+    user: ID!
 }
 
 input CreateCategoryInput {
@@ -163,8 +158,8 @@ input UpdateCategoryInput {
 }
 
 input CreateBookmarkInput {
-    postId: ID!
-    userId: ID!
+    post: ID!
+    user: ID!
 }
 
 input CreateReadingListInput {

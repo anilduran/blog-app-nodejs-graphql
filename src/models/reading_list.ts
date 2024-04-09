@@ -11,7 +11,7 @@ const readingListSchema = new mongoose.Schema({
     imageUrl: {
         type: String
     },
-    creatorId: {
+    creator: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
