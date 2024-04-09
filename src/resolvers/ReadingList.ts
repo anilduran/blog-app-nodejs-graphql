@@ -6,7 +6,7 @@ const ReadingList = {
         return creator
     },
     async posts(parent, args, contextValue, info)  {
-
+        
     }
 
 }

@@ -38,8 +38,8 @@ type Mutation {
     createReadingList(data: CreateReadingListInput!): ReadingList!
     updateReadingList(id: ID!, data: UpdateReadingListIput!): ReadingList!
     deleteReadingList(id: ID!): ReadingList!
-    addPostToReadingList(postId: ID!, readingListId: ID!): Post!
-    removePostFromReadingList(postId: ID!, readingListId: ID!): Post!
+    addPostToReadingList(post: ID!, readingList: ID!): Post!
+    removePostFromReadingList(post: ID!, readingList: ID!): Post!
 }
 
 type User {
@@ -124,7 +124,6 @@ input CreatePostInput {
     content: String!
     imageUrl: String!
     isVisible: Boolean!
-    author: ID!
 }
 
 input UpdatePostInput {
@@ -138,13 +137,11 @@ input UpdatePostInput {
 input CreateCommentInput {
     content: String!
     post: ID!
-    user: ID!
 }
 
 input UpdateCommentInput {
     content: String!
     post: ID!
-    user: ID!
 }
 
 input CreateCategoryInput {
@@ -159,7 +156,6 @@ input UpdateCategoryInput {
 
 input CreateBookmarkInput {
     post: ID!
-    user: ID!
 }
 
 input CreateReadingListInput {

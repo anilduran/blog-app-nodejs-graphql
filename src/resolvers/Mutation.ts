@@ -6,6 +6,8 @@ import Comment from '../models/comment'
 import Category from '../models/category'
 import Bookmark from '../models/bookmark'
 import ReadingList from '../models/reading_list'
+import authenticate from '../middlewares/authenticate'
+import { GraphQLError, graphql } from 'graphql'
 
 const Mutation = {
     async signIn(parent, args, contextValue, info) {
@@ -23,6 +25,7 @@ const Mutation = {
         }
 
         const token = jwt.sign({
+            id: user.id,
             username: user.username,
             email: user.email
         }, process.env.SECRET, {
@@ -45,7 +48,6 @@ const Mutation = {
             ]
         })
 
-
         if (exists) {
             throw new Error('User already exists!')
         }
@@ -61,6 +63,7 @@ const Mutation = {
         await user.save()
 
         const token = jwt.sign({
+            id: user.id,
             username: user.username,
             email: user.email
         }, process.env.SECRET, {
@@ -71,6 +74,7 @@ const Mutation = {
 
     },
     async createUser(parent, args, contextValue, info) {
+        authenticate(contextValue.token)
         const userExists = await User.exists({
             $or: [
                 {
@@ -100,8 +104,13 @@ const Mutation = {
 
     },
     async updateUser(parent, args, contextValue, info) {
+        const authenticatedUser = authenticate(contextValue.token)
 
         const user = await User.findById(args.id)
+
+        if (user.id != authenticatedUser.id) {
+            throw new GraphQLError('You are not authorized to update this user!')
+        }
 
         const { username, email, password, profilePhotoUrl } = args.data
 
@@ -128,20 +137,34 @@ const Mutation = {
 
     },
     async deleteUser(parent, args, contextValue, info) {
-        const user = await User.findByIdAndDelete(args.id)
-        return user
+        const authenticatedUser = authenticate(contextValue.token)
+        const user = await User.findById(args.id)
+
+        if (user.id != authenticatedUser.id) {
+            throw new GraphQLError('You are not authorized to delete this user!')
+        }
+
+        const deletedUser = await User.findByIdAndDelete(args.id)
+        return deletedUser
     },
     async createPost(parent, args, contextValue, info) {
-        const { title, description, content, imageUrl, isVisible, author } = args.data
-        const post = new Post({ title, description, content, imageUrl, isVisible, author })
+        const user = authenticate(contextValue.token)
+        const { title, description, content, imageUrl, isVisible } = args.data
+        console.log(user)
+        const post = new Post({ title, description, content, imageUrl, isVisible, author: user.id })
         await post.save()
         return post
     },
     async updatePost(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
 
         const { title, description, content, imageUrl, isVisible } = args.data
 
         const post = await Post.findById(args.id)
+
+        if (post.author.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to update this post!')
+        }
         
         if (title) {
             post.title = title
@@ -169,35 +192,62 @@ const Mutation = {
 
     },
     async deletePost(parent, args, contextValue, info) {
-        const post = await Post.findByIdAndDelete(args.id)
-        return post
+        const user = authenticate(contextValue.token)
+        
+        const post = await Post.findById(args.id)
+
+        if (post.author.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to delete this post!')
+        }
+        
+        const deletedPost = await Post.findByIdAndDelete(args.id)
+        
+        return deletedPost
     },
     async createComment(parent, args, contextValue, info) {
-        const { content, post, user } = args.data
-        const comment = new Comment({ content, post, user })
+        const user = authenticate(contextValue.token)
+        const { content, post } = args.data
+        const comment = new Comment({ content, post, user: user.id })
         await comment.save()
         return comment
     },
     async updateComment(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
+
         const comment = await Comment.findById(args.id)
+        
+        if (comment.user.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to update this comment!')
+        }
+
         if (args.data.content) {
             comment.content = args.data.content
         }
+
         await comment.save()
+
         return comment
     },
     async deleteComment(parent, args, contextValue, info) {
-        const comment = await Comment.findByIdAndDelete(args.id)
-        return comment
+        const user = authenticate(contextValue.token)
+        const comment = await Comment.findById(args.id)
+      
+        if (comment.user.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to delete this comment!')
+        }
+
+        const deletedComment = await Comment.findByIdAndDelete(args.id)
+        return deletedComment
     },
     async createCategory(parent, args, contextValue, info) {
+        authenticate(contextValue.token)
         const { name, description } = args.data
         const category = new Category({ name, description })
         await category.save()
         return category
     },
     async updateCategory(parent, args, contextValue, info) {    
-
+        authenticate(contextValue.token)
         const { name, description } = args.data
         const category = await Category.findById(args.id)
 
@@ -214,30 +264,45 @@ const Mutation = {
 
     },
     async deleteCategory(parent, args, contextValue, info) {
+        authenticate(contextValue.token)
         const category = await Category.findByIdAndDelete(args.id)
         return category
     },
     async createBookmark(parent, args, contextValue, info) {
-        const { user, post } = args.data
-        const bookmark = new Bookmark({ user, post })
+        const user = authenticate(contextValue.token)
+        const { post } = args.data
+        const bookmark = new Bookmark({ user: user.id, post })
         await bookmark.save()
         return bookmark
     },
     async deleteBookmark(parent, args, contextValue, info) {
-        const bookmark = await Bookmark.findByIdAndDelete(args.id)
-        return bookmark
+        const user = authenticate(contextValue.token)
+        const bookmark = await Bookmark.findById(args.id)
+
+        if (bookmark.user.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to delete this bookmark!')
+        }
+
+        const deletedBookmark = await Bookmark.findByIdAndDelete(args.id)
+        return deletedBookmark
     },
     async createReadingList(parent, args, contextValue, info) {
-        const { name, description, creator, imageUrl } = args.data
-        const readingList = new ReadingList({ name, description, creator, imageUrl })
+        const user = authenticate(contextValue.token)
+        const { name, description, imageUrl } = args.data
+        const readingList = new ReadingList({ name, description, creator: user.id, imageUrl })
         await readingList.save()
         return readingList
     },
     async updateReadingList(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
         
         const { name, description, imageUrl } = args.data
 
         const readingList = await ReadingList.findById(args.id)
+
+        if (readingList.creator.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to update this reading list!')
+        }
 
         if (name) {
             readingList.name = name
@@ -257,13 +322,46 @@ const Mutation = {
 
     },
     async deleteReadingList(parent, args, contextValue, info) {
-        const readingList = await ReadingList.findByIdAndDelete(args.id)
-        return readingList
+        const user = authenticate(contextValue.token)
+        const readingList = await ReadingList.findById(args.id)
+
+        if (readingList.creator.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to delete this reading list!')
+        }
+        
+        const deletedReadingList = await ReadingList.findByIdAndDelete(args.id)
+        return deletedReadingList
     },
     async addPostToReadingList(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
+
+        const readingList = await ReadingList.findById(args.data.readingList)
+
+        if (readingList.creator.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to perform this action!')
+        }
+
+        const post = await Post.findById(args.data.post)
         
+        readingList.posts.push(post.id)
+
+        await post.save()
+
+        return readingList
+    
     },
     async removePostFromReadingList(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
+        
+        const readingList = await ReadingList.findById(args.data.readingList)
+
+        if (readingList.creator.toString() != user.id) {
+            throw new GraphQLError('You are not authorized to perform this action!')
+        }
+
+        const post = await Post.findById(args.data.post)
+
+        
 
     }
 }

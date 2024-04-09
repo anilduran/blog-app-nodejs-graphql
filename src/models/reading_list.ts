@@ -1,6 +1,18 @@
 import mongoose from "mongoose";
 
-const readingListSchema = new mongoose.Schema({
+interface IReadingList {
+    name: string
+    description: string
+    imageUrl: string
+    creator: mongoose.Schema.Types.ObjectId
+    posts: Array<mongoose.Schema.Types.ObjectId>
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+}
+
+
+const readingListSchema = new mongoose.Schema<IReadingList>({
     name: {
         type: String,
         required: true
@@ -15,6 +27,12 @@ const readingListSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    posts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post'
+        }
+    ],
     createdAt: {
         type: Date,
         required: true,
@@ -30,6 +48,6 @@ const readingListSchema = new mongoose.Schema({
     }
 })
 
-const ReadingList = mongoose.model('ReadingList', readingListSchema)
+const ReadingList = mongoose.model<IReadingList>('ReadingList', readingListSchema)
 
 export { ReadingList as default}

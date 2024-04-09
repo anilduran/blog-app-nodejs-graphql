@@ -1,6 +1,11 @@
 import mongoose, { mongo } from 'mongoose'
 
-const bookmarkSchema = new mongoose.Schema({
+interface IBookmark {
+    post: mongoose.Schema.Types.ObjectId
+    user: mongoose.Schema.Types.ObjectId
+}
+
+const bookmarkSchema = new mongoose.Schema<IBookmark>({
     post: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
@@ -11,6 +16,6 @@ const bookmarkSchema = new mongoose.Schema({
     }
 })
 
-const Bookmark = mongoose.model('Bookmark', bookmarkSchema)
+const Bookmark = mongoose.model<IBookmark>('Bookmark', bookmarkSchema)
 
 export { Bookmark as default }

@@ -1,6 +1,7 @@
 import Bookmark from "../models/bookmark"
 import Comment from "../models/comment"
 import User from "../models/user"
+import { default as PostModel } from '../models/post'
 
 const Post = {
     async author(parent, args, contextValue, info) {
@@ -14,7 +15,7 @@ const Post = {
         return comments
     },
     async categories(parent, args, contextValue, info) {
-
+     
     },
     async bookmarks(parent, args, contextValue, info) {
         const bookmarks = await Bookmark.find({

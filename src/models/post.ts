@@ -1,7 +1,19 @@
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 
+interface IPost {
+    title: string
+    description: string
+    content: string
+    imageUrl: string
+    isVisible: boolean
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+    author: mongoose.Schema.Types.ObjectId
+    categories: Array<mongoose.Schema.Types.ObjectId>
+}
 
-const postSchema = new mongoose.Schema({
+const postSchema = new mongoose.Schema<IPost>({
     title: {
         type: String,
         required: true
@@ -32,6 +44,10 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
+    deletedAt: {
+        type: Date,
+        required: false
+    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -44,6 +60,6 @@ const postSchema = new mongoose.Schema({
     ]
 })
 
-const Post = mongoose.model('Post', postSchema)
+const Post = mongoose.model<IPost>('Post', postSchema)
 
 export { Post as default }
