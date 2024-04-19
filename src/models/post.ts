@@ -6,11 +6,9 @@ interface IPost {
     content: string
     imageUrl: string
     isVisible: boolean
-    createdAt: Date
-    updatedAt: Date
     deletedAt: Date
-    author: mongoose.Schema.Types.ObjectId
-    categories: Array<mongoose.Schema.Types.ObjectId>
+    author: mongoose.Types.ObjectId
+    categories: Array<mongoose.Types.ObjectId>
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -34,16 +32,6 @@ const postSchema = new mongoose.Schema<IPost>({
         required: true,
         default: true
     },
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
     deletedAt: {
         type: Date,
         required: false
@@ -58,6 +46,8 @@ const postSchema = new mongoose.Schema<IPost>({
             ref: 'Category'
         }
     ]
+}, {
+    timestamps: true
 })
 
 const Post = mongoose.model<IPost>('Post', postSchema)

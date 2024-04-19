@@ -6,6 +6,7 @@ interface IUser {
     password: string
     profilePhotoUrl: string
     isActive: Boolean
+    bookmarks: Array<mongoose.Types.ObjectId>
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -29,6 +30,15 @@ const userSchema = new mongoose.Schema<IUser>({
         required: true,
         default: true
     },
+    bookmarks: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+            required: true
+        }
+    ]
+}, {
+    timestamps: true
 })
 
 const User = mongoose.model<IUser>('User', userSchema)

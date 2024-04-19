@@ -1,14 +1,12 @@
 
 type Query {
-    
     users: [User!]!
     posts: [Post!]!
     comments: [Comment!]!
     categories: [Category!]!
-    bookmarks: [Bookmark!]!
+    bookmarks: [Post!]!
     me: User!
     readingLists: [ReadingList]!
-
 }
 
 type Mutation {
@@ -32,15 +30,19 @@ type Mutation {
     updateCategory(id: ID!, data: UpdateCategoryInput!): Category!
     deleteCategory(id: ID!): Category!
 
-    createBookmark(data: CreateBookmarkInput!): Bookmark!
-    deleteBookmark(id: ID!): Bookmark!
+    createBookmark(post: ID!): Post!
+    deleteBookmark(post: ID!): Post!
 
     createReadingList(data: CreateReadingListInput!): ReadingList!
     updateReadingList(id: ID!, data: UpdateReadingListIput!): ReadingList!
     deleteReadingList(id: ID!): ReadingList!
     addPostToReadingList(post: ID!, readingList: ID!): Post!
     removePostFromReadingList(post: ID!, readingList: ID!): Post!
+
+    createPresignedUrlForImage: PresignedUrlResponse!
 }
+
+scalar Date
 
 type User {
     id: ID!
@@ -49,6 +51,7 @@ type User {
     password: String!
     posts: [Post!]!
     comments: [Comment!]!
+    bookmarks: [Post!]!
 }
 
 type Post {
@@ -61,7 +64,7 @@ type Post {
     author: User!
     comments: [Comment!]!
     categories: [Category!]!
-    bookmarks: [Bookmark!]!
+    bookmarks: [Post!]!
 }
 
 type Comment {
@@ -76,12 +79,8 @@ type Category {
     name: String!
     description: String
     posts: [Post!]!
-}
-
-type Bookmark {
-    id: ID!
-    post: Post!
-    user: User!
+    createdAt: Date!
+    updatedAt: Date!
 }
 
 type ReadingList {
@@ -154,10 +153,6 @@ input UpdateCategoryInput {
     description: String
 }
 
-input CreateBookmarkInput {
-    post: ID!
-}
-
 input CreateReadingListInput {
     name: String!
     description: String
@@ -168,4 +163,9 @@ input UpdateReadingListIput {
     name: String
     description: String
     imageUrl: String
+}
+
+type PresignedUrlResponse {
+    key: String!
+    url: String!
 }

@@ -1,4 +1,3 @@
-import Bookmark from "../models/bookmark"
 import Comment from "../models/comment"
 import User from "../models/user"
 import { default as PostModel } from '../models/post'
@@ -15,14 +14,9 @@ const Post = {
         return comments
     },
     async categories(parent, args, contextValue, info) {
-     
+        const post = await PostModel.findById(parent.id).populate('categories').exec()
+        return post.categories
     },
-    async bookmarks(parent, args, contextValue, info) {
-        const bookmarks = await Bookmark.find({
-            postId: parent.id
-        })
-        return bookmarks
-    }
 }
 
 export { Post as default }

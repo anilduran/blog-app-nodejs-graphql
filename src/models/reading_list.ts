@@ -4,10 +4,8 @@ interface IReadingList {
     name: string
     description: string
     imageUrl: string
-    creator: mongoose.Schema.Types.ObjectId
-    posts: Array<mongoose.Schema.Types.ObjectId>
-    createdAt: Date
-    updatedAt: Date
+    creator: mongoose.Types.ObjectId
+    posts: Array<mongoose.Types.ObjectId>
     deletedAt: Date
 }
 
@@ -33,19 +31,11 @@ const readingListSchema = new mongoose.Schema<IReadingList>({
             ref: 'Post'
         }
     ],
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
     deletedAt: {
         type: Date
     }
+}, {
+    timestamps: true
 })
 
 const ReadingList = mongoose.model<IReadingList>('ReadingList', readingListSchema)

@@ -1,3 +1,7 @@
+import dotenv from 'dotenv'
+dotenv.config({
+    path: __dirname + '/.env'
+})
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import Query from './resolvers/Query'
@@ -5,15 +9,12 @@ import Mutation from './resolvers/Mutation'
 import User from './resolvers/User'
 import Post from './resolvers/Post'
 import Category from './resolvers/Category'
-import Bookmark from './resolvers/Bookmark'
 import mongoose from 'mongoose'
 import Comment from './resolvers/Comment'
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
-import dotenv from 'dotenv'
 import ReadingList from './resolvers/ReadingList'
 
-dotenv.config()
 
 const server = new ApolloServer({
     typeDefs: readFileSync(join(__dirname, 'schema.graphql'), 'utf-8'),
@@ -23,7 +24,6 @@ const server = new ApolloServer({
         User,
         Post,
         Category,
-        Bookmark,
         Comment,
         ReadingList
     }

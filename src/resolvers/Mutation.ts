@@ -4,10 +4,13 @@ import bcrypt, { hash } from 'bcrypt'
 import Post from '../models/post'
 import Comment from '../models/comment'
 import Category from '../models/category'
-import Bookmark from '../models/bookmark'
 import ReadingList from '../models/reading_list'
 import authenticate from '../middlewares/authenticate'
 import { GraphQLError, graphql } from 'graphql'
+import { v4 as uuidv4 } from 'uuid'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import s3 from '../utils/s3'
 
 const Mutation = {
     async signIn(parent, args, contextValue, info) {
@@ -268,24 +271,6 @@ const Mutation = {
         const category = await Category.findByIdAndDelete(args.id)
         return category
     },
-    async createBookmark(parent, args, contextValue, info) {
-        const user = authenticate(contextValue.token)
-        const { post } = args.data
-        const bookmark = new Bookmark({ user: user.id, post })
-        await bookmark.save()
-        return bookmark
-    },
-    async deleteBookmark(parent, args, contextValue, info) {
-        const user = authenticate(contextValue.token)
-        const bookmark = await Bookmark.findById(args.id)
-
-        if (bookmark.user.toString() != user.id) {
-            throw new GraphQLError('You are not authorized to delete this bookmark!')
-        }
-
-        const deletedBookmark = await Bookmark.findByIdAndDelete(args.id)
-        return deletedBookmark
-    },
     async createReadingList(parent, args, contextValue, info) {
         const user = authenticate(contextValue.token)
         const { name, description, imageUrl } = args.data
@@ -335,13 +320,13 @@ const Mutation = {
     async addPostToReadingList(parent, args, contextValue, info) {
         const user = authenticate(contextValue.token)
 
-        const readingList = await ReadingList.findById(args.data.readingList)
+        const readingList = await ReadingList.findById(args.readingList)
 
         if (readingList.creator.toString() != user.id) {
             throw new GraphQLError('You are not authorized to perform this action!')
         }
 
-        const post = await Post.findById(args.data.post)
+        const post = await Post.findById(args.post)
         
         readingList.posts.push(post.id)
 
@@ -353,15 +338,38 @@ const Mutation = {
     async removePostFromReadingList(parent, args, contextValue, info) {
         const user = authenticate(contextValue.token)
         
-        const readingList = await ReadingList.findById(args.data.readingList)
+        const readingList = await ReadingList.findById(args.readingList)
 
         if (readingList.creator.toString() != user.id) {
             throw new GraphQLError('You are not authorized to perform this action!')
         }
 
-        const post = await Post.findById(args.data.post)
+        const post = await Post.findById(args.post)
 
-        
+        await ReadingList.updateOne({  _id: readingList.id }, { $pull: { posts: post.id } })
+
+        return post
+    
+    },
+    async createPresignedUrlForImage(parent, args, contextValue, info) {
+        const user = authenticate(contextValue.token)
+
+        try {
+            const key = `images/${user.id}/${uuidv4()}.jpeg`
+
+            const command = new PutObjectCommand({
+                Bucket: process.env.bucket,
+                Key: key,
+                ContentType: 'image/jpeg'
+            })
+
+            const url = await getSignedUrl(s3, command, { expiresIn: 60 * 5 })
+
+            return { url, key }
+
+        } catch(error) {
+            throw new GraphQLError('Failed to create presigned url!')
+        }
 
     }
 }

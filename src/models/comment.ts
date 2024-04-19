@@ -2,27 +2,14 @@ import mongoose from 'mongoose'
 
 interface IComment {
     content: string
-    createdAt: Date
-    updatedAt: Date
-    user: mongoose.Schema.Types.ObjectId
-    post: mongoose.Schema.Types.ObjectId
+    user: mongoose.Types.ObjectId
+    post: mongoose.Types.ObjectId
 }
-
 
 const commentSchema = new mongoose.Schema<IComment>({
     content: {
         type: String,
         required: true
-    },
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        required: true,
-        default: Date.now
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,6 +19,8 @@ const commentSchema = new mongoose.Schema<IComment>({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
     }
+}, {
+    timestamps: true
 })
 
 const Comment = mongoose.model<IComment>('Comment', commentSchema)

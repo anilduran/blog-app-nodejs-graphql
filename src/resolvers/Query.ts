@@ -1,5 +1,4 @@
 import authenticate from '../middlewares/authenticate';
-import Bookmark from '../models/bookmark';
 import Category from '../models/category';
 import Comment from '../models/comment';
 import Post from '../models/post';
@@ -22,11 +21,6 @@ const Query = {
         authenticate(contextValue.token)
         const categories = await Category.find()
         return categories        
-    },
-    async bookmarks(parent, args, contextValue, info) {
-        authenticate(contextValue.token)
-        const bookmarks = await Bookmark.find()
-        return bookmarks
     },
     async comments(parent, args, contextValue, info) {
         authenticate(contextValue.token)
