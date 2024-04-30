@@ -1,12 +1,12 @@
 
 type Query {
-    users: UsersResult!
-    posts: PostsResult!
-    comments: CommentsResult!
-    categories: CategoriesResult!
-    bookmarks: BookmarksResult!
+    users(cursor: ID, limit: Int!): UsersResult!
+    posts(cursor: ID, limit: Int!): PostsResult!
+    comments(cursor: ID, limit: Int!): CommentsResult!
+    categories(cursor: ID, limit: Int!): CategoriesResult!
+    bookmarks(cursor: ID, limit: Int!): BookmarksResult!
     me: User!
-    readingLists: ReadingListsResult!
+    readingLists(cursor: ID, limit: Int!): ReadingListsResult!
 }
 
 type Mutation {
