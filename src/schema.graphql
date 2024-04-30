@@ -1,12 +1,12 @@
 
 type Query {
-    users: [User!]!
-    posts: [Post!]!
-    comments: [Comment!]!
-    categories: [Category!]!
-    bookmarks: [Post!]!
+    users: UsersResult!
+    posts: PostsResult!
+    comments: CommentsResult!
+    categories: CategoriesResult!
+    bookmarks: BookmarksResult!
     me: User!
-    readingLists: [ReadingList]!
+    readingLists: ReadingListsResult!
 }
 
 type Mutation {
@@ -43,6 +43,41 @@ type Mutation {
 }
 
 scalar Date
+
+type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: ID
+}
+
+type UsersResult {
+    edges: [User!]!
+    pageInfo: PageInfo!
+}
+
+type PostsResult {
+    edges: [Post!]!
+    pageInfo: PageInfo!
+}
+
+type CommentsResult {
+    edges: [Comment!]!
+    pageInfo: PageInfo!
+}
+
+type CategoriesResult {
+    edges: [Category!]!
+    pageInfo: PageInfo!
+}
+
+type BookmarksResult {
+    edges: [Post!]!
+    pageInfo: PageInfo!
+}
+
+type ReadingListsResult {
+    edges: [ReadingList!]!
+    pageInfo: PageInfo!
+}
 
 type User {
     id: ID!
